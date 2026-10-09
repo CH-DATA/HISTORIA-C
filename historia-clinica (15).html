@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Historia Clínica</title>
+<style>
+:root{--p:#0b5ea8;--bg:#eef2f6;--bd:#d5dde6;--mu:#64748b;--red:#c62828;--grn:#2e7d32}
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:#12202f;font-size:14px}
+input,select,textarea,button{font:inherit}
+input,select,textarea{width:100%;padding:7px 9px;border:1px solid var(--bd);border-radius:6px;background:#fff}
+input:disabled,select:disabled,textarea:disabled{background:#f4f6f8;color:#333}
+textarea{min-height:64px;resize:vertical}
+label{display:block;font-size:11px;color:var(--mu);margin:8px 0 3px;font-weight:700;text-transform:uppercase;letter-spacing:.02em}
+.btn{background:var(--p);color:#fff;border:0;border-radius:6px;padding:8px 14px;cursor:pointer;font-weight:600}
+.btn.sec{background:#fff;color:var(--p);border:1px solid var(--p)}.btn.red{background:var(--red)}.btn.sm{padding:3px 9px;font-size:12px}
+.card{background:#fff;border-radius:10px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px #0002}
+.grid{display:grid;gap:4px 12px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:800px){.g3,.g4{grid-template-columns:1fr 1fr}.side{display:none}}
+#app{display:flex;min-height:100vh}
+.side{width:200px;background:#0a3d6b;color:#d6e6f5;padding:16px 10px;flex-shrink:0}
+.side h2{color:#fff;font-size:16px;margin:0 0 2px}
+.side a{display:block;color:#d6e6f5;padding:9px 12px;border-radius:6px;margin:3px 0;cursor:pointer}
+.side a:hover,.side a.on{background:#134f88;color:#fff}
+#main{flex:1;padding:18px;max-width:1150px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+h1{font-size:20px;margin:0}h3{margin:0 0 6px;font-size:15px;text-decoration:underline;text-transform:uppercase}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:7px;border-bottom:1px solid var(--bd);vertical-align:top}th{font-size:11px;color:var(--mu);text-transform:uppercase}
+tr.click{cursor:pointer}tr.click:hover{background:#f5f9fd}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:11px;font-weight:700;color:#fff;background:#78909c}.b-ok{background:var(--grn)}.b-op{background:#ef8f00}.b-red{background:var(--red)}
+.alert{background:#fdecea;border:1px solid #f5c2bd;color:#8a1c14;padding:9px 12px;border-radius:8px;margin-bottom:10px;font-weight:700}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}.tabs button{background:#fff;border:1px solid var(--bd);padding:7px 12px;border-radius:6px;cursor:pointer}.tabs button.on{background:var(--p);color:#fff;border-color:var(--p)}
+.login{max-width:360px;margin:10vh auto}
+.res{border:1px solid var(--bd);border-radius:6px;background:#fff;max-height:170px;overflow:auto}.res div{padding:6px 10px;cursor:pointer}.res div:hover{background:#e8f2fc}
+.row{display:flex;gap:8px;align-items:center}.row>*{flex:1}.row>.fix{flex:0}
+.mic{background:#fff;border:1px solid var(--bd);border-radius:5px;cursor:pointer;padding:0 6px;font-size:11px;text-transform:none}.mic.on{background:var(--red);color:#fff}
+.note{border-left:4px solid var(--p);background:#f7fafd;padding:8px 12px;margin-bottom:8px;border-radius:0 6px 6px 0}.note.enf{border-color:#2e7d32}
+.hi{color:var(--red);font-weight:700}
+pre{background:#0f172a;color:#e2e8f0;padding:10px;border-radius:8px;overflow:auto;font-size:12px}
+@media print{.side,.noprint{display:none!important}}
+
+/* ===== TEMA MEJORADO ===== */
+:root{--p:#0e7490;--bg:#f1f5f9;--bd:#e2e8f0}
+body{background:var(--bg)}
+.side{background:linear-gradient(180deg,#0f3d56,#0b2a3d);box-shadow:2px 0 12px #0002}
+.side a{border-radius:8px;transition:.15s}.side a.on{background:#0e7490}
+.card{border-radius:14px;box-shadow:0 2px 10px #0f172a14;border:1px solid #eef2f6}
+h3{text-decoration:none;color:#0f3d56;border-bottom:2px solid #cfe8ef;padding-bottom:6px;margin-bottom:12px;font-size:13px;letter-spacing:.05em}
+.btn{border-radius:8px;box-shadow:0 1px 2px #0002;transition:.15s}.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+input:focus,select:focus,textarea:focus{outline:2px solid #67c1d6;border-color:#0e7490}
+th{background:#f8fafc}
+.hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap;background:linear-gradient(120deg,#0f3d56,#0e7490);color:#fff;border-radius:16px;padding:20px;margin-bottom:14px;box-shadow:0 4px 16px #0e749044}
+.av{width:68px;height:68px;border-radius:50%;background:#fff;color:#0e7490;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;flex-shrink:0}
+.hero h1{color:#fff;font-size:22px}.hero small{opacity:.85}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.st{background:#fff;border-radius:12px;padding:10px 14px;border:1px solid var(--bd);box-shadow:0 1px 4px #0f172a0d}
+.st span{display:block;font-size:10px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.04em}.st b{font-size:15px}
+.tl{position:relative;margin:6px 0 0 8px;padding-left:24px;border-left:3px solid #cfe8ef}
+.tli{position:relative;background:#fff;border:1px solid var(--bd);border-radius:12px;padding:10px 14px;margin-bottom:12px;box-shadow:0 1px 4px #0f172a0d}
+.tli:before{content:'';position:absolute;left:-34px;top:16px;width:12px;height:12px;border-radius:50%;background:#0e7490;border:3px solid #fff;box-shadow:0 0 0 2px #0e7490}
+.tli .h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:4px}
+.chip{display:inline-block;background:#e0f2f7;color:#0e7490;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:700;margin-right:4px}
+.tli p{margin:4px 0}.tli .m{color:var(--mu);font-size:12px}
+
+/* ===== LOGIN ===== */
+.lg{display:flex;width:100%;min-height:100vh;background:#f1f5f9}
+.lg-art{flex:1.1;position:relative;overflow:hidden;background:radial-gradient(circle at 20% 15%,#14a3b8 0,#0e7490 35%,#0b2a3d 100%);color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:40px;text-align:center}
+.lg-art h2{font-size:30px;margin:18px 0 8px}.lg-art p{max-width:380px;opacity:.9;line-height:1.5;margin:0}
+.lg-art svg{width:min(420px,80%);height:auto;filter:drop-shadow(0 20px 30px #0006)}
+.bub{position:absolute;border-radius:50%;background:#ffffff14;animation:fl 8s ease-in-out infinite}
+.bub:nth-child(1){width:220px;height:220px;top:-60px;right:-60px}.bub:nth-child(2){width:140px;height:140px;bottom:40px;left:-40px;animation-delay:-3s}.bub:nth-child(3){width:90px;height:90px;bottom:160px;right:70px;animation-delay:-5s}
+@keyframes fl{50%{transform:translateY(-22px)}}
+.ecg{stroke-dasharray:420;stroke-dashoffset:420;animation:dr 3s linear infinite}@keyframes dr{60%,100%{stroke-dashoffset:0}}
+.pulse{animation:pl 1.6s ease-in-out infinite;transform-origin:center;transform-box:fill-box}@keyframes pl{50%{transform:scale(1.18)}}
+.lg-form{flex:1;display:flex;align-items:center;justify-content:center;padding:30px}
+.lg-box{width:100%;max-width:380px}
+.lg-box h1{font-size:28px;margin-bottom:4px}.lg-box .sub{color:var(--mu);margin:0 0 22px}
+.lg-box input{padding:12px 14px;border-radius:10px;font-size:15px}
+.lg-box .btn{width:100%;padding:13px;font-size:16px;margin-top:20px;background:linear-gradient(90deg,#0e7490,#14a3b8)}
+.pw{position:relative}.pw span{position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;font-size:18px;user-select:none}
+.hint{margin-top:22px;padding:12px 14px;border-radius:10px;background:#e0f2f7;color:#0f3d56;font-size:13px;line-height:1.5}
+@media(max-width:800px){.lg{flex-direction:column}.lg-art{flex:none;padding:26px 20px}.lg-art svg{width:150px}.lg-art h2{font-size:22px;margin:10px 0 4px}.lg-art p{display:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.FIREBASE_CONFIG=null; // o configúralo en Configuración. Sin config usa modo local (localStorage)
+
+/* ===== UTILIDADES ===== */
+const $=s=>document.querySelector(s),val=i=>{const e=$('#'+i);return e?e.value:''};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const sha=async t=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)))].map(x=>x.toString(16).padStart(2,'0')).join('');
+const fmt=t=>t?new Date(t).toLocaleString('es-PE',{dateStyle:'short',timeStyle:'short'}):'';
+const nowLocal=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,16);
+const edadDe=f=>{if(!f)return'';const d=new Date(f),n=new Date();let a=n.getFullYear()-d.getFullYear();if(n<new Date(n.getFullYear(),d.getMonth(),d.getDate()))a--;return a};
+const ageOf=p=>p.fnac?edadDe(p.fnac):(p.edadRef||'');
+const go=h=>{location.hash=h};
+const S={users:[],pacientes:[],ingresos:[],audit:[]};
+let ME=JSON.parse(sessionStorage.getItem('hc_u')||'null'),R={editing:false},CUR=null,TAB='fil',FS=null,lastLog='';
+
+/* ===== DATOS: Firestore o local ===== */
+const DB={mode:'local',async init(){
+ const cfg=JSON.parse(localStorage.getItem('hc_fbcfg')||'null')||window.FIREBASE_CONFIG;
+ if(cfg&&cfg.apiKey){try{
+  const a=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+  const f=await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+  const db=f.getFirestore(a.initializeApp(cfg));FS={db,f};DB.mode='firestore';
+  for(const c of Object.keys(S))await new Promise(res=>{let first=true;f.onSnapshot(f.collection(db,c),sn=>{S[c]=sn.docs.map(d=>d.data());if(first){first=false;res()}else if(!R.editing&&ME)render()})});
+  return}catch(e){console.error(e);alert('No se pudo conectar a Firebase; modo local. '+e.message)}}
+ for(const c of Object.keys(S))S[c]=JSON.parse(localStorage.getItem('hc_'+c)||'[]')},
+async put(c,o){const i=S[c].findIndex(x=>x.id===o.id);i<0?S[c].push(o):S[c][i]=o;
+ if(DB.mode==='firestore')await FS.f.setDoc(FS.f.doc(FS.db,c,o.id),JSON.parse(JSON.stringify(o)));else localStorage.setItem('hc_'+c,JSON.stringify(S[c]))},
+async del(c,id){S[c]=S[c].filter(x=>x.id!==id);if(DB.mode==='firestore')await FS.f.deleteDoc(FS.f.doc(FS.db,c,id));else localStorage.setItem('hc_'+c,JSON.stringify(S[c]))}};
+const log=(accion,detalle='')=>DB.put('audit',{id:uid(),ts:Date.now(),user:ME?ME.user:'sistema',accion,detalle});
+
+/* ===== PERMISOS ===== */
+const PERM={admin:['pac','vit','evol','clin','users','audit','cfg'],medico:['pac','vit','evol','clin'],enfermeria:['pac','vit','evol'],admision:['pac'],paciente:[]};
+const can=p=>ME&&PERM[ME.rol].includes(p);
+
+/* ===== CAMPOS DE LA HISTORIA ===== */
+const FIL=[['apePat','APELLIDO PATERNO'],['apeMat','APELLIDO MATERNO'],['nombres','NOMBRE'],['lugarNac','L. NACIMIENTO'],['procedencia','PROCEDENCIA'],['edad','EDAD','number'],
+ ['instruccion','INSTRUCCIÓN','sel',['Analfabeto','Primaria incompleta','Primaria completa','Secundaria incompleta','Secundaria completa','Superior técnico','Superior universitario']],['ocupacion','OCUPACIÓN'],
+ ['civil','E. CIVIL','sel',['Soltero(a)','Casado(a)','Conviviente','Viudo(a)','Divorciado(a)']],
+ ['fIngreso','F. DE INGRESO','datetime-local'],['motivo','MOTIVO DE INGRESO','area']];
+const EA=[['tiempo','Tiempo de enfermedad'],['inicio','Forma de inicio','sel',['Insidioso','Brusco']],['curso','Curso','sel',['Progresivo','Estacionario','Remitente','Intermitente']],['relato','Relato cronológico (signos y síntomas principales)','area']];
+const BIO=[['apetito','Apetito'],['sed','Sed'],['sueno','Sueño'],['deposiciones','Deposiciones'],['diuresis','Diuresis'],['peso','Peso (variaciones)']];
+const ANT=[['fisio','Fisiológicos (nacimiento, desarrollo, vacunas)','area'],['patol','Patológicos','area'],['quir','Quirúrgicos','area'],['alerg','Alergias','area'],['med','Medicamentos de uso actual','area'],['fam','Familiares','area'],['ocup','Ocupacionales / hábitos nocivos','area'],['gineco','Gineco-obstétricos (FUR, G P, anticoncepción)','area']];
+const EF=[['general','Examen general (estado general, piel y faneras, TCSC)','area'],['cabeza','Cabeza y cuello','area'],['torax','Tórax y pulmones','area'],['cardio','Cardiovascular','area'],['abdomen','Abdomen','area'],['gu','Genitourinario','area'],['neuro','Neurológico','area'],['osteo','Osteomuscular','area']];
+const PLAN=[['aux','Plan de trabajo: exámenes auxiliares solicitados','area'],['tto','Tratamiento (medicamento, dosis, vía, frecuencia, duración)','area'],['cuidados','Dieta y cuidados','area'],['cita','Próxima cita','date']];
+const ALTA=[['fecha','Fecha y hora de alta','datetime-local'],['condicion','Condición de egreso','sel',['Mejorado','Curado','Sin mejoría','Referido','Retiro voluntario','Fallecido']],['dxEgreso','Diagnóstico de egreso'],['resumen','Resumen de evolución (epicrisis)','area'],['indic','Indicaciones al alta','area']];
+const CIE=`A09|Diarrea y gastroenteritis infecciosa
+A90|Dengue
+B82.9|Parasitosis intestinal
+D50.9|Anemia ferropénica
+E11.9|Diabetes mellitus tipo 2
+E66.9|Obesidad
+E78.5|Hiperlipidemia
+F32.9|Episodio depresivo
+F41.1|Ansiedad generalizada
+G43.9|Migraña
+I10|Hipertensión arterial esencial
+I50.9|Insuficiencia cardíaca
+J02.9|Faringitis aguda
+J03.9|Amigdalitis aguda
+J06.9|Infección aguda de vías respiratorias superiores
+J18.9|Neumonía
+J20.9|Bronquitis aguda
+J45.9|Asma
+K29.7|Gastritis
+K35.8|Apendicitis aguda
+K80.2|Colelitiasis
+L30.9|Dermatitis
+M54.5|Lumbalgia
+N10|Pielonefritis aguda
+N39.0|Infección de vías urinarias
+O80|Parto único espontáneo
+R05|Tos
+R07.4|Dolor torácico
+R10.4|Dolor abdominal
+R50.9|Fiebre
+R51|Cefalea
+S93.4|Esguince de tobillo
+T14.9|Traumatismo
+U07.1|COVID-19
+Z00.0|Examen médico general
+Z34|Supervisión de embarazo normal`.split('\n').map(l=>{const[c,d]=l.split('|');return{c,d}});
+const CLASES={penicilina:['amoxicilina','ampicilina','penicilina','dicloxacilina'],aines:['ibuprofeno','diclofenaco','naproxeno','ketorolaco','aspirina'],sulfa:['cotrimoxazol','sulfametoxazol']};
+const alergiaHit=(txt,p)=>(p.alergias||'').toLowerCase().split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean).filter(a=>txt.toLowerCase().includes(a)||(CLASES[a]||[]).some(m=>txt.toLowerCase().includes(m)));
+
+/* generador de formularios */
+const F=(pre,defs,d,ed)=>`<div class="grid g3">${defs.map(([k,l,t,o])=>{if(k==='_sp')return'<div></div>';const v=(d||{})[k]??'',id=pre+'_'+k,dis=ed?'':'disabled';
+ const inp=t==='area'?`<textarea id="${id}" ${dis}>${esc(v)}</textarea>`:t==='sel'?`<select id="${id}" ${dis}><option value=""></option>${o.map(x=>`<option ${v===x?'selected':''}>${x}</option>`).join('')}</select>`:`<input id="${id}" type="${t||'text'}" value="${esc(v)}" ${dis}>`;
+ return `<div style="${t==='area'?'grid-column:1/-1':''}"><label>${l} ${t==='area'&&ed?`<button class="mic" type="button" onclick="mic('${id}',this)">🎙</button>`:''}</label>${inp}</div>`}).join('')}</div>`;
+const C=(pre,defs)=>Object.fromEntries(defs.filter(d=>d[0]!=='_sp').map(([k])=>[k,val(pre+'_'+k)]));
+let REC=null;function mic(id,b){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return alert('Dictado por voz solo en Chrome o Edge.');
+ if(REC){REC.stop();return}REC=new SR();REC.lang='es-PE';REC.continuous=true;b.classList.add('on');
+ REC.onresult=e=>{const t=[...e.results].slice(e.resultIndex).map(r=>r[0].transcript).join(' ').trim();const el=$('#'+id);el.value+=(el.value?' ':'')+t};REC.onend=()=>{b.classList.remove('on');REC=null};REC.start()}
+
+/* ===== ARRANQUE / ROUTER ===== */
+async function boot(){$('#app').innerHTML='<div class="login card">Cargando…</div>';await DB.init();
+ const h1234=await sha('1234');
+ let adm=S.users.find(u=>u.user==='administrador');
+ if(!adm){adm=S.users.find(u=>u.rol==='admin'&&!u.pass);
+  if(adm){adm.user='administrador';adm.pass=h1234;adm.nombre=adm.nombre||'Administrador';await DB.put('users',adm)}
+  else await DB.put('users',{id:uid(),nombre:'Administrador',user:'administrador',rol:'admin',pass:h1234})}
+ for(const p of S.pacientes)await syncPacUser(p);
+ if(ME){ME=S.users.find(u=>u.id===ME.id)||null;if(!ME)sessionStorage.removeItem('hc_u')}
+ window.addEventListener('hashchange',render);render()}
+function render(){
+ R.editing=false;if(!S.users.length)return firstRun();if(!ME)return loginView();
+ const p=(location.hash||'#/dash').split('/'),sec=p[1];
+ const esPac=ME.rol==='paciente';
+ const nav=esPac?[['mi','📄 Mi historia',1]]:[['dash','🏠 Inicio',1],['pac','📋 Historias clínicas',can('pac')],['users','👥 Usuarios',can('users')],['audit','🛡 Auditoría',can('audit')],['cfg','⚙ Configuración',can('cfg')]];
+ $('#app').innerHTML=`<div class="side"><h2>🏥 Historia Clínica</h2><small>${DB.mode==='firestore'?'☁ Firestore':'💾 Modo local'}</small><hr style="opacity:.25">
+ ${nav.filter(n=>n[2]).map(n=>`<a class="${(sec===n[0]||(sec==='ing'&&n[0]==='pac')||esPac)?'on':''}" onclick="go('#/${n[0]}')">${n[1]}</a>`).join('')}
+ <hr style="opacity:.25"><small>${esc(ME.nombre)}<br>${ME.rol}</small><hr style="opacity:.25"><a onclick="logout()">🚪 Cerrar sesión</a></div><div id="main"></div>`;
+ const m=$('#main');
+ if(esPac){m.innerHTML=miHistoria();return}
+ if(sec==='dash'||!sec)m.innerHTML=dash();
+ else if(sec==='pac'&&!p[2])m.innerHTML=pacList();
+ else if(sec==='pac'&&p[2]==='new')openForm();
+ else if(sec==='pac'&&p[3]==='ing')openForm(p[2]);
+ else if(sec==='pac'&&p[3]==='edit')pacEdit(p[2]);
+ else if(sec==='pac'&&p[3]==='hc')hcFull(p[2]);
+ else if(sec==='pac')pacView(p[2]);
+ else if(sec==='ing')ingView(p[2]);
+ else if(sec==='users')m.innerHTML=usersView();
+ else if(sec==='audit')m.innerHTML=auditView();
+ else if(sec==='cfg')m.innerHTML=cfgView()}
+/* ===== CUENTA DEL PACIENTE: usuario = DNI, contraseña = DNI ===== */
+async function syncPacUser(p,reset){
+ let u=S.users.find(x=>x.rol==='paciente'&&x.pacienteId===p.id);const dni=String(p.dni).toLowerCase();
+ const nombre=(p.apePat+' '+p.apeMat+', '+p.nombres).trim();
+ if(u&&u.user===dni&&u.nombre===nombre&&!reset)return;
+ if(!u)u={id:uid(),rol:'paciente',pacienteId:p.id};
+ if(!u.pass||u.user!==dni||reset)u.pass=await sha(p.dni);
+ u.user=dni;u.nombre=nombre;await DB.put('users',u)}
+async function resetPac(id){const u=S.users.find(x=>x.id===id),p=S.pacientes.find(x=>x.id===u.pacienteId);if(!p)return;
+ if(!confirm('¿Restablecer la contraseña de '+u.nombre+' a su DNI?'))return;await syncPacUser(p,true);await log('Restableció clave de paciente',p.hc);alert('Listo. Usuario y contraseña: '+p.dni);render()}
+function firstRun(){$('#app').innerHTML=`<div class="login card"><h1>Primer uso</h1><p>Crea el administrador.</p><label>Nombre completo</label><input id="n"><label>Usuario</label><input id="u"><label>Contraseña (mín. 6)</label><input id="p" type="password"><br><br><button class="btn" onclick="mkAdmin()">Crear y entrar</button></div>`}
+async function mkAdmin(){const n=val('n').trim(),u=val('u').trim().toLowerCase(),p=val('p');if(!n||!u||p.length<6)return alert('Completa todo.');
+ const us={id:uid(),nombre:n,user:u,rol:'admin',pass:await sha(p)};await DB.put('users',us);ME=us;sessionStorage.setItem('hc_u',JSON.stringify(us));await log('Creó administrador',u);render()}
+function loginView(){$('#app').innerHTML=`<div class="lg"><div class="lg-art"><i class="bub"></i><i class="bub"></i><i class="bub"></i>
+<svg viewBox="0 0 400 340" fill="none"><rect x="95" y="30" width="210" height="270" rx="22" fill="#fff"/><rect x="150" y="16" width="100" height="36" rx="12" fill="#0b2a3d"/><circle cx="200" cy="34" r="7" fill="#67c1d6"/>
+<rect x="177" y="78" width="46" height="46" rx="12" fill="#e0f2f7"/><path d="M200 88v26M187 101h26" stroke="#0e7490" stroke-width="9" stroke-linecap="round"/>
+<rect x="120" y="140" width="160" height="10" rx="5" fill="#cfe8ef"/><rect x="120" y="160" width="110" height="10" rx="5" fill="#e2eef3"/>
+<path class="ecg" d="M115 232h42l14-42 22 82 20-60 12 20h60" stroke="#0e7490" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+<g class="pulse"><circle cx="318" cy="70" r="30" fill="#ff5d73"/><path d="M318 86s-18-11-18-23a9 9 0 0118-3 9 9 0 0118 3c0 12-18 23-18 23z" fill="#fff"/></g>
+<circle cx="84" cy="250" r="26" fill="#14a3b8"/><path d="M84 238v24M72 250h24" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>
+<h2>Tu salud, siempre contigo</h2><p>Consulta tu historial de atenciones, servicios y fechas de forma segura desde cualquier lugar.</p></div>
+<div class="lg-form"><div class="lg-box"><h1>Bienvenido 👋</h1><p class="sub">Ingresa para ver tu historia clínica</p>
+<label>Usuario o DNI</label><input id="u" autocomplete="username" placeholder="Ej. 74065600" onkeydown="if(event.key==='Enter')$('#p').focus()">
+<label>Contraseña</label><div class="pw"><input id="p" type="password" autocomplete="current-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"><span onclick="const e=$('#p');e.type=e.type==='password'?'text':'password'">👁</span></div>
+<button class="btn" onclick="login()">Ingresar →</button>
+<div class="hint">🧑‍⚕️ <b>Pacientes:</b> su usuario y contraseña es su <b>N° de DNI</b>.</div></div></div></div>`}
+async function login(){const h=await sha(val('p').trim()),us=S.users.find(x=>x.user===val('u').trim().toLowerCase()&&x.pass===h);if(!us){await log('Acceso fallido',val('u'));return alert('Credenciales incorrectas')}
+ ME=us;sessionStorage.setItem('hc_u',JSON.stringify(us));await log('Inicio de sesión');go(ME.rol==='paciente'?'#/mi':'#/dash');render()}
+async function logout(){await log('Cierre de sesión');ME=null;sessionStorage.removeItem('hc_u');location.hash='';render()}
+
+/* ===== INICIO ===== */
+function dash(){const ab=S.ingresos.filter(i=>i.estado!=='Alta'),hoy=new Date().toDateString();
+ return `<div class="top"><h1>Inicio</h1>${can('pac')?'<button class="btn" onclick="go(\'#/pac/new\')">+ Apertura de historia clínica</button>':''}</div>
+ <div class="grid g4"><div class="card"><h3>Pacientes</h3><b style="font-size:26px">${S.pacientes.length}</b></div><div class="card"><h3>Ingresos hoy</h3><b style="font-size:26px">${S.ingresos.filter(i=>new Date(i.creado).toDateString()===hoy).length}</b></div>
+ <div class="card"><h3>Ingresos abiertos</h3><b style="font-size:26px">${ab.length}</b></div><div class="card"><h3>Altas</h3><b style="font-size:26px">${S.ingresos.length-ab.length}</b></div></div>
+ <div class="card"><h3>Pacientes con ingreso abierto</h3><table><tr><th>Paciente</th><th>F. ingreso</th><th>Motivo</th></tr>${ab.map(i=>{const p=S.pacientes.find(x=>x.id===i.pacienteId)||{};return `<tr class="click" onclick="go('#/ing/${i.id}')"><td>${esc(p.apePat)} ${esc(p.apeMat)}, ${esc(p.nombres)}</td><td>${fmt(i.fil.fIngreso)}</td><td>${can('clin')||can('vit')?esc(i.fil.motivo):'—'}</td></tr>`}).join('')||'<tr><td colspan=3>Ninguno</td></tr>'}</table></div>`}
+
+/* ===== PACIENTES ===== */
+const pacRows=q=>{q=(q||'').toLowerCase();return S.pacientes.filter(p=>!q||(p.dni+p.apePat+p.apeMat+p.nombres+p.hc).toLowerCase().includes(q)).sort((a,b)=>(a.apePat+a.apeMat).localeCompare(b.apePat+b.apeMat)).map(p=>`<tr class="click" onclick="go('#/pac/${p.id}')"><td>${p.hc}</td><td>${p.dni}</td><td>${esc(p.apePat)} ${esc(p.apeMat)}, ${esc(p.nombres)}</td><td>${ageOf(p)}</td><td>${esc(p.seguro)}</td><td>${p.alergias?'<span class="badge b-red">'+esc(p.alergias)+'</span>':'—'}</td><td><button class="btn sm" onclick="event.stopPropagation();go('#/pac/${p.id}/hc')">✏ Editar</button></td></tr>`).join('')||'<tr><td colspan=7>Sin resultados</td></tr>'};
+function pacList(){return `<div class="top"><h1>Historias clínicas</h1><button class="btn" onclick="go('#/pac/new')">+ Apertura de historia clínica</button></div><div class="card"><input placeholder="Buscar por DNI, apellidos, nombre o N° HC…" oninput="$('#pl').innerHTML=pacRows(this.value)"><br><br><table><tr><th>N° HC</th><th>DNI</th><th>Paciente</th><th>Edad</th><th>Seguro</th><th>Alergias</th><th></th></tr><tbody id="pl">${pacRows('')}</tbody></table></div>`}
+function pacView(id){const p=S.pacientes.find(x=>x.id===id);if(!p)return $('#main').innerHTML='No encontrado';
+ const ings=S.ingresos.filter(i=>i.pacienteId===id).sort((a,b)=>b.creado-a.creado),cl=can('clin')||can('vit');
+ $('#main').innerHTML=`<div class="top"><div><h1>${esc(p.apePat)} ${esc(p.apeMat)}, ${esc(p.nombres)}</h1><span style="color:var(--mu)">${p.hc} · DNI ${p.dni} · ${ageOf(p)} años · ${p.sexo==='M'?'Masculino':'Femenino'} · ${esc(p.seguro)}</span></div>
+ <div class="noprint"><button class="btn sec" onclick="go('#/pac/${id}/edit')">Editar datos</button> ${can('clin')?`<button class="btn sec" onclick="printHC('${id}')">🖨 Imprimir HC</button>`:''} ${can('pac')?`<button class="btn" onclick="go('#/pac/${id}/ing')">+ Nuevo ingreso</button>`:''}</div></div>
+ ${p.alergias?`<div class="alert">⚠ ALERGIAS: ${esc(p.alergias)}</div>`:''}
+ <div class="card"><h3>Ingresos</h3><table><tr><th>N°</th><th>F. ingreso</th><th>Motivo</th><th>Diagnóstico</th><th>Estado</th></tr>${ings.map(i=>`<tr class="click" onclick="go('#/ing/${i.id}')"><td>${i.n}</td><td>${fmt(i.fil.fIngreso)}</td><td>${cl?esc(i.fil.motivo):'—'}</td><td>${cl?(i.dx||[]).map(d=>esc(d.c)).join(', '):''}</td><td><span class="badge ${i.estado==='Alta'?'b-ok':'b-op'}">${i.estado}</span></td></tr>`).join('')||'<tr><td colspan=5>Sin ingresos</td></tr>'}</table></div>`}
+function openForm(pid){const p=S.pacientes.find(x=>x.id===pid);R.editing=true;
+ const d=p?{apePat:p.apePat,apeMat:p.apeMat,nombres:p.nombres,lugarNac:p.lugarNac,procedencia:p.procedencia,instruccion:p.instruccion,ocupacion:p.ocupacion,civil:p.civil,edad:ageOf(p),fIngreso:nowLocal()}:{fIngreso:nowLocal()};
+ $('#main').innerHTML=`<div class="top"><h1>${p?'Nuevo ingreso — '+p.hc:'Apertura de historia clínica'}</h1></div>
+ ${p?'':`<div class="card"><h3>Identificación</h3><div class="grid g4"><div><label>DNI / CE</label><input id="x_dni" maxlength="12"></div><div><label>Sexo</label><select id="x_sexo"><option value="F">Femenino</option><option value="M">Masculino</option></select></div>
+ <div><label>Fecha de nacimiento</label><input id="x_fnac" type="date" onchange="$('#fil_edad').value=edadDe(this.value)"></div><div><label>Seguro</label><select id="x_seg"><option>EsSalud</option><option>SIS</option><option>Particular</option><option>EPS</option><option>Otro</option></select></div>
+ <div><label>Teléfono</label><input id="x_tel"></div><div style="grid-column:span 2"><label>Domicilio</label><input id="x_dir"></div><div><label>Alergias (separadas por coma)</label><input id="x_ale" placeholder="penicilina, aines"></div></div></div>`}
+ <div class="card"><h3>Filiación</h3>${F('fil',FIL,d,true)}</div><button class="btn" onclick="openSave('${pid||''}')">Guardar y abrir historia</button> <button class="btn sec" onclick="history.back()">Cancelar</button>`}
+async function openSave(pid){
+ const f=C('fil',FIL);if(!f.apePat||!f.nombres||!f.motivo||!f.fIngreso)return alert('Apellido paterno, nombre, fecha de ingreso y motivo de ingreso son obligatorios.');
+ let p=S.pacientes.find(x=>x.id===pid);
+ if(!p){const dni=val('x_dni').trim();if(!/^\d{8,12}$/.test(dni))return alert('DNI inválido (8 a 12 dígitos).');
+  const ex=S.pacientes.find(x=>x.dni===dni);if(ex){if(confirm('Ya existe una historia con ese DNI ('+ex.hc+'). ¿Abrirla?'))go('#/pac/'+ex.id);return}
+  const n=Math.max(0,...S.pacientes.map(x=>+x.hc.slice(3)))+1;
+  p={id:uid(),hc:'HC-'+String(n).padStart(6,'0'),dni,sexo:val('x_sexo'),fnac:val('x_fnac'),tel:val('x_tel'),dir:val('x_dir'),seguro:val('x_seg'),alergias:val('x_ale'),creado:Date.now()}}
+ Object.assign(p,{apePat:f.apePat.toUpperCase(),apeMat:f.apeMat.toUpperCase(),nombres:f.nombres.toUpperCase(),lugarNac:f.lugarNac,procedencia:f.procedencia,instruccion:f.instruccion,ocupacion:f.ocupacion,civil:f.civil,edadRef:f.edad});
+ await DB.put('pacientes',p);await syncPacUser(p);
+ const g={id:uid(),pacienteId:p.id,n:S.ingresos.filter(i=>i.pacienteId===p.id).length+1,creado:Date.now(),creadoPor:ME.user,estado:'Abierto',fil:f,ea:{},bio:{},ant:{alerg:p.alergias||''},ef:{},vitales:[],dx:[],plan:{},evol:[],indic:[],alta:{}};
+ await DB.put('ingresos',g);await log('Apertura de ingreso',p.hc+' #'+g.n);TAB='fil';go('#/ing/'+g.id)}
+function pacEdit(id){const p=S.pacientes.find(x=>x.id===id);R.editing=true;
+ $('#main').innerHTML=`<div class="top"><h1>Datos del paciente — ${p.hc}</h1></div><div class="card"><div class="grid g4"><div><label>DNI / CE</label><input id="x_dni" value="${esc(p.dni)}"></div><div><label>Sexo</label><select id="x_sexo"><option value="F">Femenino</option><option value="M" ${p.sexo==='M'?'selected':''}>Masculino</option></select></div>
+ <div><label>Fecha de nacimiento</label><input id="x_fnac" type="date" value="${p.fnac||''}"></div><div><label>Seguro</label><select id="x_seg">${['EsSalud','SIS','Particular','EPS','Otro'].map(s=>`<option ${p.seguro===s?'selected':''}>${s}</option>`).join('')}</select></div>
+ <div><label>Teléfono</label><input id="x_tel" value="${esc(p.tel)}"></div><div style="grid-column:span 2"><label>Domicilio</label><input id="x_dir" value="${esc(p.dir)}"></div><div><label>Alergias</label><input id="x_ale" value="${esc(p.alergias)}"></div></div><br>
+ <button class="btn" onclick="pacEditSave('${id}')">Guardar</button> <button class="btn sec" onclick="history.back()">Cancelar</button></div>`}
+async function pacEditSave(id){const p=S.pacientes.find(x=>x.id===id),dni=val('x_dni').trim();if(!/^\d{8,12}$/.test(dni))return alert('DNI inválido.');if(S.pacientes.some(x=>x.dni===dni&&x.id!==id))return alert('DNI ya registrado.');
+ Object.assign(p,{dni,sexo:val('x_sexo'),fnac:val('x_fnac'),seguro:val('x_seg'),tel:val('x_tel'),dir:val('x_dir'),alergias:val('x_ale')});await DB.put('pacientes',p);await syncPacUser(p);await log('Editó paciente',p.hc);go('#/pac/'+id)}
+
+/* ===== HISTORIA COMPLETA EDITABLE + FICHAS (fecha, servicio, descripción) ===== */
+const fd=x=>x?x.split('-').reverse().join('/'):'';
+const rango=f=>f.desde?'Desde '+fd(f.desde):'';
+const fichasTL=(fs,del,id)=>fs.length?'<div class="tl">'+fs.map(f=>`<div class="tli"><div class="h"><span><span class="chip">📅 ${esc(fd(f.fecha))}</span><span class="chip">🏥 ${esc(f.servicio)}</span>${f.desde?'<span class="chip">⏱ '+esc(rango(f))+'</span>':''}</span>${del?`<button class="btn red sm" onclick="delFicha('${id}','${f.id}')">🗑 Eliminar</button>`:''}</div>
+ ${f.dx?'<p><b>Diagnóstico:</b> '+esc(f.dx)+'</p>':''}<p>${esc(f.descripcion).replace(/\n/g,'<br>')}</p>
+ <div class="m">👨‍⚕️ ${esc(f.prof||f.user)}${del?' · registró '+esc(f.user)+' · '+fmt(f.ts):''}</div></div>`).join('')+'</div>':'<p style="color:var(--mu)">Sin fichas registradas.</p>';
+const SERVICIOS=['Consulta externa','Emergencia','Hospitalización','Medicina general','Pediatría','Obstetricia','Cirugía','Odontología','Laboratorio','Imagenología','Enfermería','Otro'];
+function hcFull(id){
+ const p=S.pacientes.find(x=>x.id===id);if(!p)return $('#main').innerHTML='No encontrado';
+ const g=S.ingresos.filter(i=>i.pacienteId===id).sort((a,b)=>b.creado-a.creado)[0];
+ if(!g){alert('Este paciente no tiene ingresos. Se abrirá un nuevo ingreso.');return go('#/pac/'+id+'/ing')}
+ CUR=g;R.editing=true;
+ const fichas=[...(p.fichas||[])].sort((a,b)=>(b.fecha+b.ts).localeCompare(a.fecha+a.ts));
+ $('#main').innerHTML=`<div class="top"><div><h1>${esc(p.apePat)} ${esc(p.apeMat)}, ${esc(p.nombres)}</h1><span style="color:var(--mu)">${p.hc} · Ingreso #${g.n}</span></div>
+  <div class="noprint"><button class="btn sec" onclick="go('#/pac')">← Volver a la lista</button> <button class="btn" onclick="hcSaveAll('${id}')">💾 Guardar toda la historia</button></div></div>
+  <div class="card"><h3>Identificación</h3><div class="grid g4"><div><label>DNI / CE</label><input id="x_dni" value="${esc(p.dni)}"></div><div><label>Sexo</label><select id="x_sexo"><option value="F">Femenino</option><option value="M" ${p.sexo==='M'?'selected':''}>Masculino</option></select></div>
+  <div><label>Fecha de nacimiento</label><input id="x_fnac" type="date" value="${p.fnac||''}"></div><div><label>Seguro</label><select id="x_seg">${['EsSalud','SIS','Particular','EPS','Otro'].map(x=>`<option ${p.seguro===x?'selected':''}>${x}</option>`).join('')}</select></div>
+  <div><label>Teléfono</label><input id="x_tel" value="${esc(p.tel)}"></div><div style="grid-column:span 2"><label>Domicilio</label><input id="x_dir" value="${esc(p.dir)}"></div><div><label>Alergias</label><input id="x_ale" value="${esc(p.alergias)}"></div></div></div>
+  <div class="card"><h3>Filiación</h3>${F('fil',FIL,g.fil,true)}</div>
+  <div class="card"><h3>Ficha: fecha, servicio y descripción</h3>
+   <div class="grid g3"><div><label>Fecha</label><input id="fc_fecha" type="date" value="${nowLocal().slice(0,10)}"></div>
+   <div><label>Servicio</label><input id="fc_serv" list="fc_servs" placeholder="Seleccione o escriba…"><datalist id="fc_servs">${SERVICIOS.map(x=>`<option value="${x}">`).join('')}</datalist></div><div><label>Profesional que atiende</label><input id="fc_prof" placeholder="Dr(a). …"></div>
+   <div><label>Desde cuándo (inicio de atención / tratamiento)</label><input id="fc_desde" type="date"></div><div><label>Diagnóstico</label><input id="fc_dx"></div>
+   <div style="grid-column:1/-1"><label>Descripción <button class="mic" type="button" onclick="mic('fc_desc',this)">🎙</button></label><textarea id="fc_desc" placeholder="Descripción de la atención…"></textarea></div></div>
+   <br><button class="btn" onclick="addFicha('${id}')">+ Agregar ficha</button><br><br>
+   ${fichasTL(fichas,true,id)}</div>
+  <button class="btn" onclick="hcSaveAll('${id}')">💾 Guardar toda la historia</button> <button class="btn sec" onclick="go('#/pac')">Volver a la lista</button>`}
+async function hcSaveAll(id,silent){
+ const p=S.pacientes.find(x=>x.id===id),g=CUR,dni=val('x_dni').trim();
+ if(!/^\d{8,12}$/.test(dni)){alert('DNI inválido (8 a 12 dígitos).');return false}
+ if(S.pacientes.some(x=>x.dni===dni&&x.id!==id)){alert('DNI ya registrado en otra historia.');return false}
+ const f=C('fil',FIL);if(!f.apePat||!f.nombres||!f.motivo){alert('Apellido paterno, nombre y motivo de ingreso son obligatorios.');return false}
+ Object.assign(p,{dni,sexo:val('x_sexo'),fnac:val('x_fnac'),seguro:val('x_seg'),tel:val('x_tel'),dir:val('x_dir'),alergias:val('x_ale'),
+  apePat:f.apePat.toUpperCase(),apeMat:f.apeMat.toUpperCase(),nombres:f.nombres.toUpperCase(),lugarNac:f.lugarNac,procedencia:f.procedencia,instruccion:f.instruccion,ocupacion:f.ocupacion,civil:f.civil,edadRef:f.edad});
+ g.fil=f;
+ await DB.put('pacientes',p);await syncPacUser(p);await DB.put('ingresos',g);await log('Editó historia completa',p.hc+' #'+g.n);
+ if(!silent)alert('Historia guardada.');return true}
+async function addFicha(id){
+ const fecha=val('fc_fecha'),servicio=val('fc_serv').trim(),descripcion=val('fc_desc').trim();
+ if(!fecha||!servicio||!descripcion)return alert('Completa fecha, servicio y descripción.');
+ if(!await hcSaveAll(id,true))return;
+ const p=S.pacientes.find(x=>x.id===id);p.fichas=p.fichas||[];
+ const desde=val('fc_desde');
+ p.fichas.push({id:uid(),fecha,servicio,descripcion,desde,prof:val('fc_prof').trim(),dx:val('fc_dx').trim(),user:ME.nombre,ts:Date.now()});
+ await DB.put('pacientes',p);await log('Agregó ficha',p.hc+' · '+servicio);render()}
+async function delFicha(id,fid){if(!confirm('¿Eliminar esta ficha?'))return;if(!await hcSaveAll(id,true))return;
+ const p=S.pacientes.find(x=>x.id===id);p.fichas=(p.fichas||[]).filter(f=>f.id!==fid);await DB.put('pacientes',p);await log('Eliminó ficha',p.hc);render()}
+
+/* ===== INGRESO (historia clínica por pestañas) ===== */
+const abn=v=>({pas:+v.pas>=140||(v.pas&&+v.pas<90),pad:+v.pad>=90,fc:+v.fc>100||(v.fc&&+v.fc<50),fr:+v.fr>20,temp:+v.temp>=38,spo2:v.spo2&&+v.spo2<94});
+const TABS=[
+ {k:'fil',n:'Filiación',v:'pac',e:'pac',html:(g,ed)=>`<h3>Filiación</h3>${F('fil',FIL,g.fil,ed)}`,
+  save:(g,p)=>{const f=C('fil',FIL);if(!f.apePat||!f.nombres||!f.motivo){alert('Apellido paterno, nombre y motivo de ingreso son obligatorios.');return false}g.fil=f;
+   Object.assign(p,{apePat:f.apePat.toUpperCase(),apeMat:f.apeMat.toUpperCase(),nombres:f.nombres.toUpperCase(),lugarNac:f.lugarNac,procedencia:f.procedencia,instruccion:f.instruccion,ocupacion:f.ocupacion,civil:f.civil,edadRef:f.edad})}},
+ {k:'vit',n:'Funciones vitales',v:'vit',e:'vit',html:(g,ed)=>`<h3>Funciones vitales</h3>${ed?`<div class="grid g4"><div><label>PA sistólica</label><input id="w_pas" type="number"></div><div><label>PA diastólica</label><input id="w_pad" type="number"></div><div><label>FC (x min)</label><input id="w_fc" type="number"></div><div><label>FR (x min)</label><input id="w_fr" type="number"></div>
+  <div><label>T° (°C)</label><input id="w_temp" type="number" step="0.1"></div><div><label>SpO₂ (%)</label><input id="w_spo2" type="number"></div><div><label>Peso (kg)</label><input id="w_peso" type="number" step="0.1"></div><div><label>Talla (cm)</label><input id="w_talla" type="number"></div></div><br><button class="btn" onclick="addVit()">+ Registrar control</button><br><br>`:''}
+  <table><tr><th>Fecha/hora</th><th>PA</th><th>FC</th><th>FR</th><th>T°</th><th>SpO₂</th><th>Peso</th><th>Talla</th><th>IMC</th><th>Registró</th></tr>${[...g.vitales].reverse().map(v=>{const a=abn(v),m=v.talla>3?v.talla/100:v.talla,im=v.peso&&m?(v.peso/(m*m)).toFixed(1):'';return `<tr><td>${fmt(v.ts)}</td><td class="${a.pas||a.pad?'hi':''}">${v.pas||'-'}/${v.pad||'-'}</td><td class="${a.fc?'hi':''}">${v.fc||'-'}</td><td class="${a.fr?'hi':''}">${v.fr||'-'}</td><td class="${a.temp?'hi':''}">${v.temp||'-'}</td><td class="${a.spo2?'hi':''}">${v.spo2||'-'}</td><td>${v.peso||'-'}</td><td>${v.talla||'-'}</td><td>${im}</td><td>${esc(v.por)}</td></tr>`}).join('')||'<tr><td colspan=10>Sin controles</td></tr>'}</table>`},
+ {k:'dx',n:'Diagnóstico',v:'clin',e:'clin',html:(g,ed)=>`<h3>Impresión diagnóstica (CIE-10)</h3>${ed?`<div class="row"><input id="cq" placeholder="Buscar código o descripción…" oninput="cieSearch(this.value)"><select id="ctp" class="fix" style="width:140px"><option>Presuntivo</option><option>Definitivo</option><option>Repetitivo</option></select><button class="btn sec sm fix" onclick="dxLibre()">Texto libre</button></div><div id="cres"></div><br>`:''}
+  ${g.dx.map((d,i)=>`<div class="row" style="padding:5px 0;border-bottom:1px solid var(--bd)"><span><b>${esc(d.c)}</b> ${esc(d.d)} <span class="badge">${d.tipo}</span></span>${ed?`<button class="btn red sm fix" onclick="delDx(${i})">✕</button>`:''}</div>`).join('')||'<p>Sin diagnósticos.</p>'}`},
+ {k:'evol',n:'Evolución',v:'evol',e:'evol',html:(g,ed)=>`<h3>Notas de evolución</h3>${ed?`<textarea id="en" placeholder="Nota de evolución ${can('clin')?'médica':'de enfermería'}…" style="min-height:90px"></textarea><br><br><button class="btn" onclick="addEvol()">+ Agregar nota (no editable)</button><br><br>`:''}
+  ${[...g.evol].reverse().map(e=>`<div class="note ${e.tipo==='Enfermería'?'enf':''}"><b>${fmt(e.ts)} · ${e.tipo} · ${esc(e.user)}</b><br>${esc(e.texto).replace(/\n/g,'<br>')}</div>`).join('')||'<p>Sin notas.</p>'}`},
+ {k:'indic',n:'Indicaciones médicas',v:'evol',e:'evol',html:(g,ed)=>`<h3>Hoja de indicaciones médicas</h3>${ed&&can('clin')?`<div class="row"><input id="in" placeholder="Indicación (ej: Paracetamol 500 mg VO c/8h)"><button class="btn fix" onclick="addIndic()">+ Indicar</button></div><br>`:''}
+  <table><tr><th>Fecha</th><th>Indicación</th><th>Indicó</th><th>Cumplido</th></tr>${[...g.indic].reverse().map((x,j)=>{const i=g.indic.length-1-j;return `<tr><td>${fmt(x.ts)}</td><td>${esc(x.texto)}</td><td>${esc(x.user)}</td><td>${x.cumplido?'✔ '+fmt(x.cumplido.ts)+' '+esc(x.cumplido.user):(ed?`<button class="btn sm sec" onclick="cumple(${i})">Marcar cumplido</button>`:'—')}</td></tr>`}).join('')||'<tr><td colspan=4>Sin indicaciones</td></tr>'}</table>`},
+ {k:'alta',n:'Alta / Epicrisis',v:'clin',e:'clin',html:(g,ed)=>`<h3>Epicrisis y alta</h3>${F('alta',ALTA,g.alta,ed)}${ed?`<br><button class="btn" onclick="darAlta()">Dar de alta y cerrar ingreso</button>`:''}${g.estado==='Alta'&&can('clin')?`<br><button class="btn sec" onclick="reabrir()">Reabrir ingreso</button>`:''}`,save:g=>{g.alta=C('alta',ALTA)}}];
+function ingView(id){
+ const g=S.ingresos.find(x=>x.id===id);if(!g)return $('#main').innerHTML='No encontrado';const p=S.pacientes.find(x=>x.id===g.pacienteId);
+ CUR=g;R.editing=true;const lock=g.estado==='Alta',tabs=TABS.filter(t=>can(t.v));if(!tabs.find(t=>t.k===TAB))TAB=tabs[0].k;
+ const t=TABS.find(x=>x.k===TAB),ed=!lock&&can(t.e);if(lastLog!==id){lastLog=id;log('Consultó ingreso',p.hc+' #'+g.n)}
+ $('#main').innerHTML=`<div class="top"><div><h1>${esc(p.apePat)} ${esc(p.apeMat)}, ${esc(p.nombres)}</h1><span style="color:var(--mu)"><a style="cursor:pointer;color:var(--p)" onclick="go('#/pac/${p.id}')">${p.hc}</a> · DNI ${p.dni} · ${ageOf(p)} años · ${p.sexo==='M'?'M':'F'} · Ingreso #${g.n} · <span class="badge ${lock?'b-ok':'b-op'}">${g.estado}</span></span></div>
+  <div class="noprint">${can('clin')?`<button class="btn sec" onclick="printIng('${id}')">🖨 Imprimir ingreso</button>`:''}</div></div>
+  ${p.alergias?`<div class="alert">⚠ ALERGIAS: ${esc(p.alergias)}</div>`:''}
+  <div class="tabs">${tabs.map(x=>`<button class="${x.k===TAB?'on':''}" onclick="swTab('${x.k}')">${x.n}</button>`).join('')}</div>
+  <div class="card">${t.html(g,ed)}${ed&&t.save?'<br><button class="btn" onclick="saveTab()">💾 Guardar</button>':''}${lock?'<p style="color:var(--mu)">Ingreso cerrado (solo lectura).</p>':''}</div>`}
+async function swTab(k){await saveTab(true);TAB=k;render()}
+async function saveTab(silent){const t=TABS.find(x=>x.k===TAB);if(!CUR||!t||!t.save||CUR.estado==='Alta'||!can(t.e))return;const p=S.pacientes.find(x=>x.id===CUR.pacienteId);
+ if(t.save(CUR,p)===false)return;await DB.put('ingresos',CUR);await DB.put('pacientes',p);await log('Guardó '+t.n,p.hc+' #'+CUR.n);if(!silent)alert('Guardado.')}
+async function addVit(){const v={ts:Date.now(),por:ME.nombre};['pas','pad','fc','fr','temp','spo2','peso','talla'].forEach(k=>v[k]=val('w_'+k));if(!Object.values(v).slice(2).some(x=>x))return alert('Ingresa al menos un valor.');CUR.vitales.push(v);await DB.put('ingresos',CUR);await log('Registró funciones vitales',CUR.id);render()}
+function cieSearch(q){q=q.toLowerCase();$('#cres').innerHTML=q.length<2?'':'<div class="res">'+CIE.filter(x=>(x.c+x.d).toLowerCase().includes(q)).slice(0,8).map(x=>`<div onclick="addDx('${x.c}')"><b>${x.c}</b> ${x.d}</div>`).join('')+'</div>'}
+async function addDx(c){if(CUR.dx.some(d=>d.c===c))return;CUR.dx.push({c,d:CIE.find(x=>x.c===c).d,tipo:val('ctp')});await DB.put('ingresos',CUR);await log('Agregó dx',c);render()}
+async function dxLibre(){const t=prompt('Diagnóstico (texto libre):');if(!t)return;CUR.dx.push({c:'—',d:t,tipo:val('ctp')});await DB.put('ingresos',CUR);render()}
+async function delDx(i){CUR.dx.splice(i,1);await DB.put('ingresos',CUR);render()}
+async function addEvol(){const t=val('en').trim();if(!t)return;CUR.evol.push({ts:Date.now(),user:ME.nombre,tipo:can('clin')?'Médica':'Enfermería',texto:t});await DB.put('ingresos',CUR);await log('Nota de evolución',CUR.id);render()}
+async function addIndic(){const t=val('in').trim();if(!t)return;const p=S.pacientes.find(x=>x.id===CUR.pacienteId),h=alergiaHit(t,p);if(h.length&&!confirm('⚠ Posible alergia: '+h.join(', ')+'\n¿Indicar de todos modos?'))return;
+ CUR.indic.push({ts:Date.now(),user:ME.nombre,texto:t});await DB.put('ingresos',CUR);await log('Indicación médica',CUR.id);render()}
+async function cumple(i){CUR.indic[i].cumplido={ts:Date.now(),user:ME.nombre};await DB.put('ingresos',CUR);render()}
+async function darAlta(){await saveTab(true);const a=CUR.alta;if(!a.fecha||!a.condicion||!a.dxEgreso)return alert('Para dar de alta se requiere fecha, condición de egreso y diagnóstico de egreso.');
+ if(!confirm('¿Cerrar el ingreso? Quedará en solo lectura.'))return;CUR.estado='Alta';CUR.cerradoPor=ME.nombre;await DB.put('ingresos',CUR);await log('Alta',CUR.id);render()}
+async function reabrir(){if(!confirm('¿Reabrir el ingreso?'))return;CUR.estado='Abierto';await DB.put('ingresos',CUR);await log('Reabrió ingreso',CUR.id);render()}
+
+/* ===== IMPRESIÓN (formato papel) ===== */
+function ingPrint(g,p){const f=g.fil,u=x=>esc(x)||'&nbsp;',c=(l,v)=>`<td><b>${l}:</b> ${u(v)}</td>`,sec=(t,rows)=>`<h2><u>${t}</u></h2>${rows}`,kv=(defs,d)=>defs.filter(x=>d&&d[x[0]]).map(([k,l])=>`<p><b>${l}:</b> ${esc(d[k]).replace(/\n/g,'<br>')}</p>`).join('');
+ return `<div style="page-break-after:always"><p style="text-align:right">HC ${p.hc} · DNI ${p.dni} · ${p.sexo} · Ingreso #${g.n}</p>
+ <h2><u>FILIACIÓN</u></h2><table class="f"><tr>${c('APELLIDO PATERNO',f.apePat)}${c('APELLIDO MATERNO',f.apeMat)}${c('NOMBRE',f.nombres)}</tr><tr>${c('L. NACIMIENTO',f.lugarNac)}${c('PROCEDENCIA',f.procedencia)}${c('EDAD',f.edad)}</tr>
+ <tr>${c('INSTRUCCIÓN',f.instruccion)}${c('OCUPACIÓN',f.ocupacion)}${c('E. CIVIL',f.civil)}</tr> <tr>${c('F. DE INGRESO',fmt(f.fIngreso))}<td></td><td></td></tr><tr><td colspan="3"><b>MOTIVO DE INGRESO:</b> ${u(f.motivo)}</td></tr></table>
+ ${sec('FUNCIONES VITALES',(g.vitales.length?(v=>`<p><b>Funciones vitales (último control ${fmt(v.ts)}):</b> PA ${v.pas||'-'}/${v.pad||'-'} · FC ${v.fc||'-'} · FR ${v.fr||'-'} · T° ${v.temp||'-'} · SpO₂ ${v.spo2||'-'} · Peso ${v.peso||'-'} · Talla ${v.talla||'-'}</p>`)(g.vitales[g.vitales.length-1]):''))}
+ ${sec('IMPRESIÓN DIAGNÓSTICA',g.dx.map(d=>`<p>${esc(d.c)} — ${esc(d.d)} (${d.tipo})</p>`).join(''))}
+ ${sec('EVOLUCIÓN',g.evol.map(e=>`<p><b>${fmt(e.ts)} · ${e.tipo} · ${esc(e.user)}:</b> ${esc(e.texto)}</p>`).join(''))}${sec('INDICACIONES MÉDICAS',g.indic.map(x=>`<p>${fmt(x.ts)} — ${esc(x.texto)} (${esc(x.user)})${x.cumplido?' ✔':''}</p>`).join(''))}
+ ${sec('FICHAS',(p.fichas||[]).slice().sort((a,b)=>a.fecha.localeCompare(b.fecha)).map(x=>`<p><b>${esc(fd(x.fecha))} · ${esc(x.servicio)}${x.desde?' · '+esc(rango(x)):''}:</b> ${x.dx?'Dx: '+esc(x.dx)+'. ':''}${esc(x.descripcion)}${x.prof?' (Atendió: '+esc(x.prof)+')':''}</p>`).join(''))}${g.estado==='Alta'?sec('EPICRISIS',kv(ALTA,g.alta)):''}</div>`}
+function popup(html){const w=window.open('','_blank');w.document.write(`<html><head><title>Historia clínica</title><style>body{font-family:Arial;padding:28px;font-size:13px}h2{margin:16px 0 6px;font-size:14px}table.f{width:100%;border-collapse:collapse}table.f td{padding:6px 4px}p{margin:4px 0}</style></head><body>${html}</body></html>`);w.document.close();setTimeout(()=>w.print(),400)}
+function printIng(id){const g=S.ingresos.find(x=>x.id===id);popup(ingPrint(g,S.pacientes.find(x=>x.id===g.pacienteId)));log('Imprimió ingreso',id)}
+function printHC(pid){const p=S.pacientes.find(x=>x.id===pid);popup(S.ingresos.filter(i=>i.pacienteId===pid).sort((a,b)=>a.creado-b.creado).map(g=>ingPrint(g,p)).join(''));log('Imprimió HC',p.hc)}
+
+/* ===== VISTA DEL PACIENTE (solo lectura, solo su historial) ===== */
+function miHistoria(){
+ const p=S.pacientes.find(x=>x.id===ME.pacienteId);if(!p)return '<div class="card">No se encontró tu historia clínica.</div>';
+ if(lastLog!=='mi'){lastLog='mi';log('Paciente consultó su historia',p.hc)}
+ const ings=S.ingresos.filter(i=>i.pacienteId===p.id).sort((a,b)=>b.creado-a.creado),
+ fichas=[...(p.fichas||[])].sort((a,b)=>(b.fecha+b.ts).localeCompare(a.fecha+a.ts)),
+ kv=(defs,d)=>defs.filter(x=>d&&d[x[0]]).map(([k,l])=>`<p><b>${l}:</b> ${esc(d[k]).replace(/\n/g,'<br>')}</p>`).join('');
+ const ini=((p.nombres||'?')[0]+(p.apePat||'')[0]).toUpperCase(),u0=fichas[0],ab=ings[0];
+ return `<div class="hero"><div class="av">${esc(ini)}</div><div style="flex:1"><h1>${esc(p.nombres)} ${esc(p.apePat)} ${esc(p.apeMat)}</h1><small>Historia ${p.hc} · DNI ${esc(p.dni)} · ${ageOf(p)} años · ${p.sexo==='M'?'Masculino':'Femenino'}</small></div>
+ <div class="noprint"><button class="btn sec" onclick="printHC('${p.id}')">🖨 Imprimir</button> <button class="btn sec" onclick="logout()">Salir</button></div></div>
+ ${p.alergias?`<div class="alert">⚠ ALERGIAS: ${esc(p.alergias)}</div>`:''}
+ <div class="stats"><div class="st"><span>N° HC</span><b>${p.hc}</b></div><div class="st"><span>Seguro</span><b>${esc(p.seguro)}</b></div><div class="st"><span>Atenciones</span><b>${fichas.length}</b></div>
+ <div class="st"><span>Último servicio</span><b>${u0?esc(u0.servicio):'—'}</b></div><div class="st"><span>Atendido por</span><b>${u0?esc(u0.prof||u0.user):'—'}</b></div><div class="st"><span>Desde</span><b>${u0&&u0.desde?esc(fd(u0.desde)):'—'}</b></div>
+ <div class="st"><span>Estado</span><b>${ab?ab.estado:'—'}</b></div></div>
+ <div class="card"><h3>Mi historial de atenciones</h3>${fichasTL(fichas,false)}</div>
+ ${ings.map(g=>{const f=g.fil;return `<div class="card"><h3>Ingreso #${g.n} <span class="badge ${g.estado==='Alta'?'b-ok':'b-op'}">${g.estado}</span></h3>
+  <p><b>Fecha de ingreso:</b> ${fmt(f.fIngreso)}</p><p><b>Motivo:</b> ${esc(f.motivo)}</p>
+  ${g.dx.length?'<p><b>Diagnóstico:</b> '+g.dx.map(d=>esc(d.c)+' '+esc(d.d)).join('; ')+'</p>':''}
+  ${g.vitales.length?`<h3 style="margin-top:12px">Funciones vitales</h3><table><tr><th>Fecha</th><th>PA</th><th>FC</th><th>FR</th><th>T°</th><th>SpO₂</th><th>Peso</th><th>Talla</th></tr>${[...g.vitales].reverse().map(v=>`<tr><td>${fmt(v.ts)}</td><td>${v.pas||'-'}/${v.pad||'-'}</td><td>${v.fc||'-'}</td><td>${v.fr||'-'}</td><td>${v.temp||'-'}</td><td>${v.spo2||'-'}</td><td>${v.peso||'-'}</td><td>${v.talla||'-'}</td></tr>`).join('')}</table>`:''}
+  ${g.evol.length?'<h3 style="margin-top:12px">Evolución</h3>'+[...g.evol].reverse().map(e=>`<div class="note ${e.tipo==='Enfermería'?'enf':''}"><b>${fmt(e.ts)} · ${e.tipo}</b><br>${esc(e.texto).replace(/\n/g,'<br>')}</div>`).join(''):''}
+  ${g.indic.length?'<h3 style="margin-top:12px">Indicaciones médicas</h3>'+[...g.indic].reverse().map(x=>`<p>${fmt(x.ts)} — ${esc(x.texto)}${x.cumplido?' ✔':''}</p>`).join(''):''}
+  ${g.estado==='Alta'?'<h3 style="margin-top:12px">Alta / Epicrisis</h3>'+kv(ALTA,g.alta):''}</div>`}).join('')||'<div class="card">Sin ingresos registrados.</div>'}`}
+
+/* ===== USUARIOS / AUDITORÍA / CONFIG ===== */
+function usersView(){return `<div class="top"><h1>Usuarios</h1></div><div class="card"><p style="color:var(--mu);margin-top:0">Cada paciente registrado tiene su cuenta automática: <b>usuario = DNI</b> y <b>contraseña = DNI</b>. Solo ve su propio historial.</p><table><tr><th>Nombre</th><th>Usuario</th><th>Rol</th><th></th></tr>${S.users.map(u=>`<tr><td>${esc(u.nombre)}</td><td>${esc(u.user)}</td><td>${u.rol==='paciente'?'<span class="badge">paciente</span>':u.rol}</td><td>${u.rol==='paciente'?`<button class="btn sec sm" onclick="resetPac('${u.id}')">Restablecer clave (= DNI)</button>`:(u.id!==ME.id?`<button class="btn red sm" onclick="delUser('${u.id}')">Eliminar</button>`:'')}</td></tr>`).join('')}</table></div>
+ <div class="card"><h3>Nuevo usuario</h3><div class="grid g4"><div><label>Nombre</label><input id="nu_n"></div><div><label>Usuario</label><input id="nu_u"></div><div><label>Contraseña</label><input id="nu_p" type="password"></div><div><label>Rol</label><select id="nu_r"><option value="medico">Médico</option><option value="enfermeria">Enfermería</option><option value="admision">Admisión</option><option value="admin">Administrador</option></select></div></div><br><button class="btn" onclick="addUser()">Crear</button></div>`}
+async function addUser(){const n=val('nu_n').trim(),u=val('nu_u').trim().toLowerCase(),p=val('nu_p');if(!n||!u||p.length<6)return alert('Datos incompletos (contraseña mín. 6).');if(S.users.some(x=>x.user===u))return alert('Usuario ya existe.');
+ await DB.put('users',{id:uid(),nombre:n,user:u,rol:val('nu_r'),pass:await sha(p)});await log('Creó usuario',u);render()}
+async function delUser(id){if(!confirm('¿Eliminar usuario?'))return;await log('Eliminó usuario',S.users.find(u=>u.id===id).user);await DB.del('users',id);render()}
+function auditView(){return `<div class="top"><h1>Auditoría de accesos</h1></div><div class="card"><table><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr>${[...S.audit].sort((a,b)=>b.ts-a.ts).slice(0,300).map(e=>`<tr><td>${fmt(e.ts)}</td><td>${esc(e.user)}</td><td>${esc(e.accion)}</td><td>${esc(e.detalle)}</td></tr>`).join('')}</table></div>`}
+function cfgView(){return `<div class="top"><h1>Configuración</h1></div><div class="card"><h3>Firebase (modo actual: ${DB.mode})</h3><textarea id="fbc" placeholder='{"apiKey":"...","authDomain":"...","projectId":"...","appId":"..."}'>${esc(localStorage.getItem('hc_fbcfg')||'')}</textarea><br><br>
+ <button class="btn" onclick="saveFb()">Guardar y recargar</button> <button class="btn sec" onclick="localStorage.removeItem('hc_fbcfg');location.reload()">Volver a modo local</button>
+ <p style="color:var(--mu)">Colecciones: users, pacientes, ingresos, audit. Para datos reales activa Firebase Authentication y reglas restrictivas en Firestore.</p></div>
+ <div class="card"><h3>Respaldo</h3><button class="btn sec" onclick="exportAll()">⬇ Exportar JSON</button> <input type="file" accept=".json" style="width:auto" onchange="importAll(this)"></div>`}
+function saveFb(){try{JSON.parse(val('fbc'));localStorage.setItem('hc_fbcfg',val('fbc'));location.reload()}catch(e){alert('JSON inválido')}}
+function exportAll(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify({pacientes:S.pacientes,ingresos:S.ingresos},null,1)],{type:'application/json'}));a.download='respaldo-hc-'+new Date().toISOString().slice(0,10)+'.json';a.click();log('Exportó respaldo')}
+async function importAll(i){const t=JSON.parse(await i.files[0].text());for(const p of t.pacientes||[])await DB.put('pacientes',p);for(const g of t.ingresos||[])await DB.put('ingresos',g);await log('Importó respaldo');alert('Importado');render()}
+boot();
+</script>
+</body>
+</html>
