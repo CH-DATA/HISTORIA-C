@@ -174,6 +174,20 @@ table{width:100%;border-collapse:collapse} th,td{border-bottom:1px solid #edf1f5
 .fs-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .fs-attach{display:flex;align-items:center;gap:8px;margin-left:auto;min-width:0}
 .fs-attach .dni-name{max-width:220px}
+
+/* ROLES: tesorero / fiscal */
+.role-hide{display:none!important}
+body.role-ro .sd-save,body.role-ro .section-add,body.role-ro .section-del,body.role-ro #btnGuardar,body.role-ro #btnRegistros,body.role-ro #recordsPanel,body.role-ro .dni-btn,body.role-ro .dni-del{display:none!important}
+.ficha-bar{display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px;padding:10px 14px;background:#eaf6fb;border:1px solid #bfe3f1;border-radius:10px;color:#17435a;font-size:13px;font-weight:700}
+.ficha-bar.show{display:flex}
+.ficha-bar small{font-weight:600;color:#4f7283;margin-left:6px}
+
+.cese-menu{position:fixed;z-index:9999;min-width:320px;max-height:72vh;overflow:auto;background:#eef4fa;border:1px solid #cfdcec;border-radius:10px;box-shadow:0 12px 28px rgba(14,34,61,.22);padding:4px}
+.cese-fecha{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px 10px;font-size:12px;font-weight:700;color:#49627b;border-bottom:1px solid #d9e4f1;margin-bottom:2px}
+.cese-fecha input{border:1px solid #c9d7e8;border-radius:6px;padding:5px 8px;font:inherit}
+.cese-menu button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:12px 14px;font:800 14px/1.2 inherit;color:#0e2a47;cursor:pointer;text-transform:uppercase}
+.cese-menu button:hover{background:#dbe8f5}
+.doc-resumen{grid-template-columns:repeat(3,1fr);margin:12px 0 4px}@media (max-width:760px){.doc-resumen{grid-template-columns:1fr}}
 </style>
 <style>
 /* Formatos ajustados a las pantallas de referencia S2–S8 */
@@ -538,6 +552,11 @@ table{width:100%;border-collapse:collapse} th,td{border-bottom:1px solid #edf1f5
 </section>
 <section class="section-view" id="view-documentos">
 <h1 class="h1">Documentos</h1><div class="subh">Lo que se guarda en Legajos y en las secciones S2–S8, ordenado por socio</div>
+<section class="stats doc-resumen">
+<div class="stat-card s1"><div class="icon-box"></div><div><div class="stat-label">Personas registradas</div><div class="stat-value" id="resTotal">0</div></div></div>
+<div class="stat-card s2"><div class="icon-box"></div><div><div class="stat-label">Personal con legajos completos</div><div class="stat-value" id="resCon">0</div></div></div>
+<div class="stat-card s4"><div class="icon-box"></div><div><div class="stat-label">Personal con legajos incompletos</div><div class="stat-value" id="resSin">0</div></div></div>
+</section>
 <div class="doc-search">
 <input type="search" id="docSearch" placeholder="🔍 Buscar por DNI, nombres o apellidos…" autocomplete="off"/>
 <select id="docSec" class="doc-sec"><option value="">Todas las secciones</option></select>
@@ -591,16 +610,37 @@ function defaultMessage(){
 }
 function errorMessage(){
   infoBox.classList.add('error');
-  infoBox.innerHTML = '<div class="info-dot">!</div><div>Credenciales incorrectas. Usa <b>ADMINISTRADOR</b> y contraseña <b>1234</b>.</div>';
+  infoBox.innerHTML = '<div class="info-dot">!</div><div>Credenciales incorrectas. Verifica tu usuario y contraseña.</div>';
 }
-function openApp(){ loginScreen.classList.add('hidden'); appScreen.classList.remove('hidden'); localStorage.setItem(SESSION_KEY,'1'); setView('inicio'); }
-function openLogin(){ appScreen.classList.add('hidden'); loginScreen.classList.remove('hidden'); localStorage.removeItem(SESSION_KEY); userInput.value=''; passInput.value=''; defaultMessage(); }
+const USERS = {
+  administrador:{pass:'1234',role:'admin',label:'Administrador'},
+  admin:{pass:'1234',role:'admin',label:'Administrador'},
+  tesorero:{pass:'tesorero',role:'tesorero',label:'Tesorero'},
+  fiscal:{pass:'fiscal',role:'fiscal',label:'Fiscal'}
+};
+function applyRole(acc){
+  const ro = acc.role !== 'admin';
+  window.__roleReadOnly = ro;
+  document.body.classList.toggle('role-ro', ro);
+  navItems.forEach(n=>n.classList.toggle('role-hide', ro && n.dataset.view!=='documentos'));
+  const lab=document.querySelector('.top-right span'); if(lab) lab.textContent=acc.label;
+  const sm=document.getElementById('legajosSubmenu'); let s1=document.getElementById('subS1');
+  if(ro && !s1){
+    s1=document.createElement('a'); s1.className='legajos-subitem'; s1.id='subS1'; s1.dataset.sub='legajos'; s1.href='#'; s1.textContent='S1. DATOS PERSONALES';
+    s1.addEventListener('click',e=>{ e.preventDefault(); setView('legajos'); });
+    sm.insertBefore(s1, sm.firstChild);
+  }
+  if(s1) s1.classList.toggle('role-hide', !ro);
+}
+function openApp(acc){ acc=acc||USERS.admin; applyRole(acc); loginScreen.classList.add('hidden'); appScreen.classList.remove('hidden'); localStorage.setItem(SESSION_KEY,'1'); setView(acc.role==='admin'?'inicio':'documentos'); }
+function openLogin(){ applyRole(USERS.admin); appScreen.classList.add('hidden'); loginScreen.classList.remove('hidden'); localStorage.removeItem(SESSION_KEY); userInput.value=''; passInput.value=''; defaultMessage(); }
 defaultMessage();
 loginForm.addEventListener('submit', function(e){
   e.preventDefault();
   const u = userInput.value.trim().toLowerCase();
   const p = passInput.value.trim();
-  if((u==='administrador' || u==='admin') && p==='1234') openApp(); else errorMessage();
+  const acc = USERS[u];
+  if(acc && p===acc.pass) openApp(acc); else errorMessage();
 });
 togglePass.addEventListener('click',()=>{ passInput.type = passInput.type==='password' ? 'text':'password'; });
 logoutBtn.addEventListener('click',(e)=>{ e.preventDefault(); openLogin(); });
@@ -951,6 +991,7 @@ document.querySelectorAll('.gen-attach').forEach(function(box){
     });
   }
   function abrirLegajo(dni){ const x=socios().find(s=>s.dni===dni); if(!x) return; llenarLegajo(x); setView('legajos'); }
+  window.__abrirLegajo=abrirLegajo;
   let actual=null;
   function perfil(dni){
     const x=socios().find(s=>s.dni===dni); if(!x) return; actual=dni;
@@ -1099,7 +1140,7 @@ document.querySelectorAll('.gen-attach').forEach(function(box){
     const q=norm($('docSearch').value).trim().split(/\s+/).filter(Boolean), sec=dsel.value, all=entries();
     const list=all.filter(e=>(!sec||e.sec===sec)&&q.every(w=>norm(e.dni+' '+e.nombre).includes(w)));
     const ord=x=>['s1'].concat(SECS).indexOf(x.sec); list.sort((a,b)=>a.nombre.localeCompare(b.nombre)||a.dni.localeCompare(b.dni)||ord(a)-ord(b));
-    $('docBody').innerHTML=list.map((e,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(e.nombre)+'</td><td>'+esc(e.dni)+'</td><td>'+esc(e.label)+'</td><td>'+esc(e.fecha)+'</td><td>'+(e.files.length?e.files.map((f,k)=>'<span class="doc-file">'+esc(f.name)+(f.data?' <a data-open="'+all.indexOf(e)+':'+k+'">Ver</a>':'')+'</span>').join(''):'—')+'</td><td><div class="so-acc"><button class="btn-mini" data-d="ver" data-i="'+all.indexOf(e)+'">Ver detalle</button>'+(e.kind==='doc'?'<button class="btn-mini" data-d="del" data-i="'+all.indexOf(e)+'">Eliminar</button>':'')+'</div></td></tr>').join('');
+    $('docBody').innerHTML=list.map((e,i)=>'<tr><td>'+(i+1)+'</td><td>'+esc(e.nombre)+'</td><td>'+esc(e.dni)+'</td><td>'+esc(e.label)+'</td><td>'+esc(e.fecha)+'</td><td>'+(e.files.length?e.files.map((f,k)=>'<span class="doc-file">'+esc(f.name)+(f.data?' <a data-open="'+all.indexOf(e)+':'+k+'">Ver</a>':'')+'</span>').join(''):'—')+'</td><td><div class="so-acc"><button class="btn-mini" data-d="ficha" data-i="'+all.indexOf(e)+'">👤 Ver ficha</button><button class="btn-mini" data-d="ver" data-i="'+all.indexOf(e)+'">Ver detalle</button>'+(window.__roleReadOnly?'<button class="btn-mini" data-d="cese" data-i="'+all.indexOf(e)+'">Desvinculación ▾</button>':'')+(e.kind==='doc'&&!window.__roleReadOnly?'<button class="btn-mini" data-d="del" data-i="'+all.indexOf(e)+'">Eliminar</button>':'')+'</div></td></tr>').join('');
     $('docEmpty').style.display=list.length?'none':'block';
     $('docEmpty').textContent=all.length?'No se encontraron documentos con esa búsqueda.':'Aún no hay documentos. Se crean al guardar en Legajos o en las secciones S2–S8.';
     $('docCount').textContent=list.length+' de '+all.length+' documentos';
@@ -1123,17 +1164,94 @@ document.querySelectorAll('.gen-attach').forEach(function(box){
     if(e.files.length) h+='<div class="dv-g">Archivos adjuntos</div>'+e.files.map((f,k)=>'<span class="dv-file">📎 '+esc(f.name)+(f.data?' <a data-open="'+window.__docEntries.indexOf(e)+':'+k+'">Ver</a>':'')+'</span>').join('');
     $('dvBody').innerHTML=h||'<div class="subh">Sin datos.</div>'; $('dvOverlay').classList.add('show');
   }
+  function verFicha(e){
+    if(!socioList().find(x=>x.dni===e.dni)){ alert('No se encontró el legajo de este socio.'); return; }
+    window.__fichaActual={dni:e.dni,nombre:e.nombre};
+    document.querySelectorAll('.sd-dni').forEach(inp=>{ inp.value=e.dni+' — '+e.nombre; inp.dispatchEvent(new Event('change')); });
+    window.__abrirLegajo(e.dni);
+  }
+  // Desvinculación (S8) desde la tabla de Documentos: solo tesorero / fiscal
+  const motivos=()=>Array.from(document.querySelectorAll('#view-s11 td.reason-cell')).map(td=>td.textContent.trim());
+  let ceseMenu=null;
+  function cerrarCese(){ if(ceseMenu){ ceseMenu.remove(); ceseMenu=null; } }
+  function abrirCese(btn,en){
+    cerrarCese();
+    const m=document.createElement('div'); m.className='cese-menu'; ceseMenu=m;
+    const hoy=new Date(); const iso=hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0')+'-'+String(hoy.getDate()).padStart(2,'0');
+    m.innerHTML='<div class="cese-fecha"><span>Fecha de cese</span><input type="date" value="'+iso+'"/></div>'+motivos().map((t,i)=>'<button type="button" data-i="'+i+'">'+esc(t)+'</button>').join('');
+    document.body.appendChild(m);
+    const r=btn.getBoundingClientRect(), w=m.offsetWidth, h=m.offsetHeight;
+    m.style.left=Math.max(8,Math.min(r.left,window.innerWidth-w-8))+'px';
+    m.style.top=Math.max(8,(r.bottom+4+h>window.innerHeight)?(r.top-h-4):(r.bottom+4))+'px';
+    m.addEventListener('click',ev=>{ const b=ev.target.closest('button[data-i]'); if(!b) return;
+      const f=m.querySelector('input').value; if(!f){ alert('Elige la fecha de cese.'); return; }
+      guardarCese(en,+b.dataset.i,f); });
+  }
+  function guardarCese(en,idx,fecha){
+    const mot=motivos(), heads=['MOTIVO DE CESE','FECHA CESE DEFINITIVO','CESE TEMPORAL – DESDE','CESE TEMPORAL – HASTA'];
+    if(!confirm('¿Registrar "'+mot[idx]+'" con fecha '+fecha+' para '+en.nombre+'?')) return;
+    const all=loadD(), old=all.find(r=>r.dni===en.dni&&r.sec==='s11'), og=old&&old.groups&&old.groups[0];
+    const rows=mot.map((t,i)=>{ const prev=og&&og.rows.find(r=>r.i===i); const val=c=>{ const x=prev&&prev.cells.find(y=>y.c===c); return x?x.v:''; };
+      return {i,cells:[{c:0,v:t},{c:1,v:i===idx?fecha:val(1)},{c:2,v:val(2)},{c:3,v:val(3)}]}; });
+    const rec={dni:en.dni,nombre:en.nombre,sec:'s11',label:secLabel('s11'),fecha:new Date().toLocaleString('es-PE'),groups:[{title:'',heads,dyn:false,rows}],loose:(old&&old.loose)||[],files:(old&&old.files)||[]};
+    const rest=all.filter(r=>!(r.dni===en.dni&&r.sec==='s11')); rest.unshift(rec);
+    if(!saveD(rest)){ alert('No hay espacio en el navegador para guardar.'); return; }
+    cerrarCese(); window.renderDocsV2();
+  }
+  document.addEventListener('click',e=>{ if(ceseMenu&&!ceseMenu.contains(e.target)&&!e.target.closest('[data-d="cese"]')) cerrarCese(); });
+  window.addEventListener('scroll',cerrarCese,true);
   $('dvClose').addEventListener('click',()=>$('dvOverlay').classList.remove('show'));
   $('dvOverlay').addEventListener('click',e=>{ if(e.target.id==='dvOverlay') $('dvOverlay').classList.remove('show'); });
   document.getElementById('view-documentos').addEventListener('click',e=>{
     const a=e.target.closest('[data-open]'); if(a){ const [i,k]=a.dataset.open.split(':').map(Number); const f=window.__docEntries[i].files[k]; openData(f.data,f.name); return; }
     const b=e.target.closest('button[data-d]'); if(!b) return; const en=window.__docEntries[+b.dataset.i]; if(!en) return;
     if(b.dataset.d==='ver') detail(en);
-    else if(confirm('¿Eliminar este documento de '+en.nombre+'?')){ saveD(loadD().filter(r=>!(r.dni===en.dni&&r.sec===en.sec))); window.renderDocsV2(); }
+    else if(b.dataset.d==='ficha') verFicha(en);
+    else if(b.dataset.d==='cese') abrirCese(b,en);
+    else if(!window.__roleReadOnly&&confirm('¿Eliminar este documento de '+en.nombre+'?')){ saveD(loadD().filter(r=>!(r.dni===en.dni&&r.sec===en.sec))); window.renderDocsV2(); }
   });
   const _sv2=setView;
   setView=function(v){ _sv2(v); if(v==='documentos') window.renderDocsV2(); if(/^s\d+$/.test(v)) fillList(); };
   fillList(); window.renderDocsV2();
+})();
+</script>
+<script>
+(function(){
+  const bar=document.createElement('div'); bar.className='ficha-bar'; bar.id='fichaBar';
+  bar.innerHTML='<div id="fichaTxt"></div><button class="btn-secondary" id="fichaVolver" type="button">← Volver a Documentos</button>';
+  const content=document.querySelector('.content'); content.insertBefore(bar,content.firstChild);
+  document.getElementById('fichaVolver').addEventListener('click',()=>setView('documentos'));
+  // Resumen de personal en Documentos (mismos iconos y cifras que Inicio)
+  [['.stat-card.s1','.doc-resumen .s1'],['.stat-card.s2','.doc-resumen .s2'],['.stat-card.s4','.doc-resumen .s4']].forEach(([from,to])=>{
+    const img=document.querySelector('#view-inicio '+from+' .icon-box img'), box=document.querySelector(to+' .icon-box');
+    if(img&&box) box.appendChild(img.cloneNode(true));
+  });
+  function updateResumen(){
+    const n=getRecords().length, f=x=>x.toLocaleString('es-PE');
+    document.getElementById('resTotal').textContent=f(1402+n);
+    document.getElementById('resCon').textContent=f(1356+n);
+    document.getElementById('resSin').textContent=f(46);
+  }
+  function lockReadOnly(){
+    document.querySelectorAll('section.section-view').forEach(sec=>{
+      if(!/^view-(legajos|s\d+)$/.test(sec.id)) return;
+      sec.querySelectorAll('input,select,textarea').forEach(el=>{ el.disabled=true; });
+    });
+  }
+  const _svR=setView;
+  setView=function(v){
+    if(window.__roleReadOnly && !(v==='documentos'||v==='legajos'||/^s\d+$/.test(v))) v='documentos';
+    const inLeg = v==='legajos'||/^s\d+$/.test(v);
+    if(!inLeg) window.__fichaActual=null;
+    _svR(v);
+    if(v==='documentos') updateResumen();
+    if(window.__roleReadOnly) lockReadOnly();
+    const f=window.__fichaActual;
+    if(inLeg && f){
+      document.getElementById('fichaTxt').innerHTML='👤 Ficha de '+f.nombre.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))+'<small>DNI '+f.dni+(window.__roleReadOnly?' · Solo lectura':'')+'</small>';
+      bar.classList.add('show');
+    } else bar.classList.remove('show');
+  };
 })();
 </script>
 </body>
